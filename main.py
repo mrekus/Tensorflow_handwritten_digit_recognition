@@ -98,3 +98,35 @@ newimg = np.array(newimg).reshape(-1, IMG_SIZE, IMG_SIZE, 1)  # Pridedama dimens
 # Spėjamas skaičius su sukurtu modeliu
 predictions = model.predict(newimg)
 print(f"Atsakymas: {np.argmax(predictions)}")  # Spėjimo atsakymas
+
+# Tiesiogiai per kamerą
+font_scale = 2
+font = cv2.FONT_HERSHEY_PLAIN
+
+cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    cap = cv2.VideoCapture(0)
+if not cap.isOpened():
+    raise OSError("Cannot open camera")
+
+
+while True:
+    ret, frame = cap.read()
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    resized = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
+    newimg = tf.keras.utils.normalize(resized, axis=1)
+    newimg = np.array(newimg).reshape(-1, IMG_SIZE, IMG_SIZE, 1)
+    predictions = model.predict(newimg)
+    status = np.argmax(predictions)
+
+    x, y, w, h = 0, 0, 100, 100
+    cv2.rectangle(frame, (x, x), (w, h), (0, 0, 0), -1)
+    cv2.putText(frame, status.astype(str), (x + int(w/5), y + int(h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+
+    cv2.imshow("Camera feed", frame)
+
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+
+    cap.release()
+    cv2.destroyAllWindows()
