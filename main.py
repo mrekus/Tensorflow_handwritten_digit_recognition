@@ -92,7 +92,9 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 resized = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
 
 # Normalizavimas
-newimg = tf.keras.utils.normalize(resized, axis=1)  # Normalizuoja tarp 0 ir 1 (dalyba iš 255)
+newimg = tf.keras.utils.normalize(
+    resized, axis=1
+)  # Normalizuoja tarp 0 ir 1 (dalyba iš 255)
 newimg = np.array(newimg).reshape(-1, IMG_SIZE, IMG_SIZE, 1)  # Pridedama dimensija
 
 # Spėjamas skaičius su sukurtu modeliu
@@ -121,7 +123,15 @@ while True:
 
     x, y, w, h = 0, 0, 100, 100
     cv2.rectangle(frame, (x, x), (w, h), (0, 0, 0), -1)
-    cv2.putText(frame, status.astype(str), (x + int(w/5), y + int(h/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    cv2.putText(
+        frame,
+        status.astype(str),
+        (x + int(w / 5), y + int(h / 2)),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
+        (0, 0, 255),
+        2,
+    )
 
     cv2.imshow("Camera feed", frame)
 
