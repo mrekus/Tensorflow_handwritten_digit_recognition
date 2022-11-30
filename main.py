@@ -76,6 +76,25 @@ model.fit(X_trainr, y_train, epochs=5, validation_split=0.3)
 test_loss, test_accuracy = model.evaluate(X_testr, y_test)
 
 # Klasių tikimybės (softmax)
-predictions = model.predict([X_testr])  # Didžiausia tikimybė bus atsakymas
+# predictions = model.predict([X_testr])  # Didžiausia tikimybė bus atsakymas
 # Predictions turi visą dataset, su np.argmax(predictions[xxx]) galima rasti kiekvieno dataset
 # elemento prediction pagal indeksą
+
+
+# Prediction ranka parašytam skaičiui
+# Užkraunam baltą skaičių juodam fone
+img = cv2.imread("4.png")
+
+# pakeičiamas į pilką
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# Resize
+resized = cv2.resize(gray, (28, 28), interpolation=cv2.INTER_AREA)
+
+# Normalizavimas
+newimg = tf.keras.utils.normalize(resized, axis=1)  # Normalizuoja tarp 0 ir 1 (dalyba iš 255)
+newimg = np.array(newimg).reshape(-1, IMG_SIZE, IMG_SIZE, 1)  # Pridedama dimensija
+
+# Spėjamas skaičius su sukurtu modeliu
+predictions = model.predict(newimg)
+print(f"Atsakymas: {np.argmax(predictions)}")  # Spėjimo atsakymas
