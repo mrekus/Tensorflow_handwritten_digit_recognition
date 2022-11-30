@@ -25,7 +25,7 @@ model = Sequential()
 # Pirmas Convolution sluoksnis (filtrų (kernels) skaičius 64, dydis 3x3) (28 - 3 + 1) = 26 x 26
 model.add(
     Conv2D(64, (3, 3), input_shape=X_trainr.shape[1:])
-)  # Imam nuo 1, kad paimtume vieno dydį, ne skaičių (60000, 28, 28, 1)
+)  # 64 convolution sluoksniai, Imam nuo 1, kad paimtume vieno dydį, ne skaičių (60000, 28, 28, 1)
 model.add(
     Activation("relu")
 )  # Aktyvacijos f-ja padaro non-linear (išmeta visas <0 reikšmes, visas >0 praleidžia į kitą sluoksnį
@@ -33,18 +33,49 @@ model.add(
     MaxPool2D(pool_size=(2, 2))
 )  # Praleis tik didžiausią 2x2 matricos reikšmę, kitas išmes
 
-# Antras Convolution sluoksnis (26 - 3 + 1) = 24 x 24
+# Antras Convolution sluoksnis
 model.add(Conv2D(64, (3, 3), input_shape=X_trainr.shape[1:]))
 model.add(Activation("relu"))
 model.add(MaxPool2D(pool_size=(2, 2)))
 
-# Trečias Convolution sluoksnis (24 - 3 + 1) = 22 x 22
+# Trečias Convolution sluoksnis
 model.add(Conv2D(64, (3, 3), input_shape=X_trainr.shape[1:]))
 model.add(Activation("relu"))
 model.add(MaxPool2D(pool_size=(2, 2)))
 
 # Pilnai sujungtas sluoksnis #1
 model.add(Flatten())  # ištiesina pvz 22x22=484
-model.add(Dense(64))  # neural network sluoksnis (visi neurons sujungti) (pvz visi 484 sujungti su visais 64)
+model.add(
+    Dense(64)
+)  # neural network sluoksnis (visi neurons sujungti) (pvz visi 484 sujungti su visais 64)
 model.add(Activation("relu"))
 
+# Pilnai sujungtas sluoksnis #2
+model.add(Dense(32))
+model.add(Activation("relu"))
+
+# Paskutinis pilnai sujungtas sluoksnis, galutinis rezultatas turi būti lygus klasių skaičiui (šiuo atveju 10
+# nes yra 10 skaičių nuo 0 iki 9)
+model.add(Dense(10))
+model.add(Activation("softmax"))  # Aktyvacijos f-ja softmax (Class probabilities)
+
+# Jei būtų binary classification Dense layer būtų vienas neuronas ir paskutinė Activation f-ja būtų sigmoid
+# Naudojam softmax, nes turim daug klasių
+
+# print(model.summary())  # Atspausdina modelio suvestinę
+
+# Modelio kompiliavimas
+model.compile(
+    loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"]
+)  # adam geriausias optimizer, fokusas yra accuracy
+
+# Modelio treniravimas
+model.fit(X_trainr, y_train, epochs=5, validation_split=0.3)
+
+# Testavimas
+test_loss, test_accuracy = model.evaluate(X_testr, y_test)
+
+# Klasių tikimybės (softmax)
+predictions = model.predict([X_testr])  # Didžiausia tikimybė bus atsakymas
+# Predictions turi visą dataset, su np.argmax(predictions[xxx]) galima rasti kiekvieno dataset
+# elemento prediction pagal indeksą
