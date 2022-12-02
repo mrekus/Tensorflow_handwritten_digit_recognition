@@ -101,15 +101,15 @@ newimg = np.array(newimg).reshape(-1, IMG_SIZE, IMG_SIZE, 1)  # Pridedama dimens
 predictions = model.predict(newimg)
 print(f"Atsakymas: {np.argmax(predictions)}")  # Spėjimo atsakymas
 
-# Tiesiogiai per kamerą
+# Tiesiogiai iš video
 font_scale = 2
 font = cv2.FONT_HERSHEY_PLAIN
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("Video nuoroda")  # Linkas į video location
 if not cap.isOpened():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("Video nuoroda")  # Linkas į video location
 if not cap.isOpened():
-    raise OSError("Cannot open camera")
+    raise OSError("Cannot open video")
 
 
 while True:
@@ -133,7 +133,7 @@ while True:
         2,
     )
 
-    cv2.imshow("Camera feed", frame)
+    cv2.imshow("Video feed", frame)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
